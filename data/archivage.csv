@@ -1,0 +1,19 @@
+numero_cnss,date_consultation,code_maladie,nom_maladie,diagnostic,prescriptions,allergies,medical_history,date_of_birth,gender
+123456788,08:36.3,,,,aaa,aaa,aa,0456-12-23,maleaa
+123456,18:29.4,5A13.1,Diabetes mellitus due to genetic defects in insulin action,,hj,gh,jk,12/22/2222,male
+789456123,30:58.3,2A00.22,Choroid plexus papilloma,,p5,al5,a5,05/05/5555,male
+123456,40:34.2,,,,p6,al6,a6,04/04/4444,femme
+0,48:53.3,2A00.22,Choroid plexus papilloma,,poiuyttree,jkl,dcq,1478-12-12,dqccddqccdc
+11643689,57:01.3,,,,,,,,
+456,01:01.1,AA40.2,Cholesteatoma of external auditory canal,,^poiuy,jhg,hgf,0055-05-05,gfd
+11642119,14:58.9,3A20.4,Alloimmune haemolytic anaemia,,ha2h,oui,no,12/07/2001,femme
+7777,31:13.0,HA01.Z,Sexual arousal dysfunctions,,wxcv,nononon,azer,07/07/2007,male
+9999,05:44.6,5A13.0,Diabetes mellitus due to genetic defects of beta cell function,,p9,al9,ant9,12/07/2008,male
+123,42:59.6,2A00.22,Choroid plexus papilloma,,aaaaaaaaaaaaaaaaa,aaaaaaaaaaaaaaaaaaaaa,aaaaaaaaa,03/31/3333,femme
+10,44:39.0,1A09,Infections due to other Salmonella,,p10,al10,grippe,10/10/2010,femme
+11,57:48.8,1D92,Coronavirus infection,corona,p11,al11,a11,11/11/2011,male
+12,2024-10-14 11:58:59.608158,5A13.1,Diabetes mellitus due to genetic defects in insulin action,d12,p12,al12,a12,2012-12-12,male
+0,2024-11-01 12:19:19.265992,8B01.0,Aneurysmal subarachnoid haemorrhage,paralysée,doliprane,non,corona,2002-12-01,male
+80,2024-11-04 14:33:59.348930,5A13.0,Diabetes mellitus due to genetic defects of beta cell function,dfgh,doliprane,lactosz,alergie,2001-01-01,male
+60,2024-11-06 14:50:54.730347,5A13.1,Diabetes mellitus due to genetic defects in insulin action,diabete,Doloprane,non,non ,2001-11-11,male
+1000,2024-11-12 12:29:06.430241,5A13.7,Diabetes mellitus due to clinically defined subtypes or syndromes,grippe,doliprane,no,grippe,2001-12-07,male

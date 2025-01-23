@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dossier Médical de {{ patient.first_name }} {{ patient.last_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .patient-info {
+            width: 60%;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .search-results {
+            margin-top: 10px;
+            list-style-type: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+        .search-results li {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .search-results li:hover {
+            background-color: #f0f0f0;
+        }
+        #selected-maladies {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #selected-maladies th, #selected-maladies td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .archived-consultations {
+            margin-top: 30px;
+        }
+        .archived-consultations table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .archived-consultations th, .archived-consultations td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .archived-consultations th {
+            background-color: #f8f8f8;
+        }
+    </style>
+</head>
+<body>
+    <div class="patient-info">
+        <h1>Modifier Dossier Médical de {{ patient.first_name }} {{ patient.last_name }}</h1>
+
+        <form action="{% url 'update_patient' patient.id %}" method="POST">
+            {% csrf_token %}
+
+            <!-- Champ numéro CNSS -->
+            <div class="form-group">
+                <label for="numero_cnss">Numéro CNSS :</label>
+                <input type="text" id="numero_cnss" name="numero_cnss" placeholder="Entrez le numéro CNSS">
+            </div>
+
+            <!-- Date de naissance -->
+            <div class="form-group">
+                <label for="date_of_birth">Date de naissance :</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" value="{{ patient.date_of_birth }}">
+            </div>
+            
+            <!-- Sexe -->
+            <div class="form-group">
+                <label for="gender">Sexe :</label>
+                <input type="text" id="gender" name="gender" value="{{ patient.gender }}">
+            </div>
+            
+            <!-- Antécédents médicaux -->
+            <div class="form-group">
+                <label for="medical_history">Antécédents médicaux :</label>
+                <textarea id="medical_history" name="medical_history">{{ patient.medical_history }}</textarea>
+            </div>
+            
+            <!-- Diagnostic -->
+            <div class="form-group">
+                <label for="diagnosis">Diagnostic :</label>
+                <textarea id="diagnosis" name="diagnosis">{{ patient.diagnosis }}</textarea>
+            </div>
+            
+            <!-- Prescriptions -->
+            <div class="form-group">
+                <label for="prescriptions">Prescriptions :</label>
+                <textarea id="prescriptions" name="prescriptions">{{ patient.prescriptions }}</textarea>
+            </div>
+            
+            <!-- Allergies -->
+            <div class="form-group">
+                <label for="allergies">Allergies :</label>
+                <textarea id="allergies" name="allergies">{{ patient.allergies }}</textarea>
+            </div>
+
+            <!-- Recherche ICD-11 -->
+            <div class="form-group">
+                <label for="icd_search">Rechercher un code ICD-11 :</label>
+                <input type="text" id="icd_search" placeholder="Entrez un code ou une description ICD-11">
+                <ul id="icd_results" class="search-results"></ul> <!-- Liste déroulante des résultats -->
+            </div>
+
+            <!-- Champs cachés pour code_maladie et nom_maladie -->
+            <input type="hidden" id="code_maladie" name="code_maladie">
+            <input type="hidden" id="nom_maladie" name="nom_maladie">
+
+            <!-- Tableau des maladies sélectionnées -->
+            <table id="selected-maladies">
+                <thead>
+                    <tr>
+                        <th>Code ICD-11</th>
+                        <th>Nom de la maladie</th>
+                    </tr>
+                </thead>
+                <tbody id="maladies-tbody">
+                    <!-- Maladies sélectionnées seront ajoutées ici -->
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn">Sauvegarder</button>
+        </form>
+
+        <!-- Champ pour saisir le numéro CNSS et afficher l'historique -->
+        <div class="form-group">
+            <label for="search_cnss">Rechercher l'historique par Numéro CNSS :</label>
+            <input type="text" id="search_cnss" name="search_cnss" placeholder="Entrez le numéro CNSS">
+            <button type="button" id="rechercher-cnss" class="btn">Afficher Historique</button>
+        </div>
+
+        <!-- Conteneur pour afficher les consultations archivées -->
+        <div class="archived-consultations">
+            <h2>Consultations Archivées pour le numéro CNSS : <span id="cnss_numero"></span></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date de Consultation</th>
+                        <th>Code Maladie</th>
+                        <th>Nom de la Maladie</th>
+                        <th>Diagnostic</th>
+                        <th>Prescriptions</th>
+                        <th>Allergies</th>
+                        <th>Antécédents Médicaux</th>
+                    </tr>
+                </thead>
+                <tbody id="historique-cnss-body">
+                    <!-- Les données seront insérées ici -->
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+            // Écouteur sur le bouton de recherche par CNSS
+            document.getElementById('rechercher-cnss').addEventListener('click', function() {
+                const cnss = document.getElementById('search_cnss').value;  // Récupérer le numéro CNSS
+                if (cnss) {
+                    fetch(`/recherche-historique/?cnss=${cnss}`)  // Faire la requête vers la vue Django
+                        .then(response => response.json())
+                        .then(data => {
+                            const historiqueBody = document.getElementById('historique-cnss-body');
+                            document.getElementById('cnss_numero').textContent = cnss;  // Afficher le CNSS
+
+                            // Vider les anciennes données
+                            historiqueBody.innerHTML = '';
+
+                            // Insérer les nouvelles données dans le tableau
+                            if (data.length > 0) {
+                                data.forEach(consultation => {
+                                    historiqueBody.innerHTML += `
+                                        <tr>
+                                            <td>${consultation.date_consultation}</td>
+                                            <td>${consultation.code_maladie}</td>
+                                            <td>${consultation.nom_maladie}</td>
+                                            <td>${consultation.diagnostic}</td>
+                                            <td>${consultation.prescriptions}</td>
+                                            <td>${consultation.allergies}</td>
+                                            <td>${consultation.medical_history}</td>
+                                        </tr>
+                                    `;
+                                });
+                            } else {
+                                historiqueBody.innerHTML = '<tr><td colspan="7">Aucune consultation trouvée pour ce numéro CNSS.</td></tr>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors de la requête :', error);
+                            alert('Une erreur est survenue lors de la recherche.');
+                        });
+                } else {
+                    alert("Veuillez entrer un numéro CNSS.");
+                }
+            });
+
+            // Fonction pour
+                        // Fonction pour la recherche ICD-11
+            const icdSearchInput = document.getElementById('icd_search');
+            const icdResults = document.getElementById('icd_results');
+            const maladiesTbody = document.getElementById('maladies-tbody');
+            const codeMaladieInput = document.getElementById('code_maladie');
+            const nomMaladieInput = document.getElementById('nom_maladie');
+
+            // Fonction pour rechercher et afficher les résultats ICD-11
+            icdSearchInput.addEventListener('input', function() {
+                const query = icdSearchInput.value;
+
+                if (query.length >= 3) {
+                    fetch(`/recherche_icd11/?query=${query}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            icdResults.innerHTML = '';
+                            if (data.resultats.length > 0) {
+                                data.resultats.forEach(item => {
+                                    const li = document.createElement('li');
+                                    li.textContent = `${item['Code ICD-11']} - ${item['Nom de la maladie']}`;
+                                    li.addEventListener('click', function() {
+                                        ajouterMaladie(item['Code ICD-11'], item['Nom de la maladie']);
+                                        icdResults.innerHTML = ''; // Vider les résultats après sélection
+                                    });
+                                    icdResults.appendChild(li);
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors de la requête :', error);
+                            alert('Erreur lors de la recherche ICD-11.');
+                        });
+                } else {
+                    icdResults.innerHTML = '';
+                }
+            });
+
+            // Fonction pour ajouter la maladie sélectionnée dans le tableau
+            function ajouterMaladie(code, nom) {
+                const tr = document.createElement('tr');
+                const codeTd = document.createElement('td');
+                codeTd.textContent = code;
+                const nomTd = document.createElement('td');
+                nomTd.textContent = nom;
+
+                tr.appendChild(codeTd);
+                tr.appendChild(nomTd);
+                maladiesTbody.appendChild(tr);
+
+                // Remplir les champs cachés pour l'envoi du formulaire
+                codeMaladieInput.value = code;
+                nomMaladieInput.value = nom;
+            }
+        </script>
+    </div>
+</body>
+</html>
+
